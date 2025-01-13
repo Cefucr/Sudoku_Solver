@@ -1,4 +1,4 @@
-# sudoku_Solver
+# Sudoku_Solver
 
 
 This is a simple script to solve the given sudoku board. 
