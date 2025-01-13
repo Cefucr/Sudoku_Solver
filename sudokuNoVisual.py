@@ -34,7 +34,7 @@ def placeable(board, num, row, col):
     return True
 
 def solve(board):
-    # Here we find the next empty slot and check what we can place there. Then we place it and d it again until it is solved.
+    # Here we find the next empty slot and check what we can place there. Then we place it and do it again until it is solved.
     empty = findEmpty(board)
     if not empty:
         return True
