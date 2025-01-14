@@ -3,7 +3,7 @@
 
 This is a simple script to solve the given sudoku board. 
 
-The current version does not have a good input method. I have a version that uses Tesseract-OCR to extract numbers from sudoku pictures. In that version you can just select a picture from your computer to solve. However in that version the OCR isn't as accurate as i want it to be so it is not included in this repo yet. When i get it working more accurately i will add it here.
+This project was turned from Pyhton to Javascript. I turned it because i wanted a better input method than making a list on python. When i get OCR working correctly i may publish that version also in this repository but for now this is a javascript project.
 <hr>
 
 RULES OF SUDOKU 
