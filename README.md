@@ -17,7 +17,8 @@ Each horizontal row can only contain numbers from 1 to 9.<br>
 Each number in the 3×3 block, vertical column or horizontal row can be used only once.
 
 <br>
-<br>
+<hr>
+
 
 ### Current problems
 <br>
