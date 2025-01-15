@@ -15,11 +15,3 @@ Each 3×3 block can only contain numbers from 1 to 9.<br>
 Each vertical column can only contain numbers from 1 to 9.<br>
 Each horizontal row can only contain numbers from 1 to 9.<br>
 Each number in the 3×3 block, vertical column or horizontal row can be used only once.
-
-<br>
-<hr>
-
-
-### Current problems
-<br>
-Currently if you give a sudoku board that intentionally has something that goes against the rules (such as having two same numbers on the same row) it will crash.  <b>TRYING TO FIX THIS</b>
