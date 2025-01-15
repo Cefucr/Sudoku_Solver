@@ -1,4 +1,5 @@
 function findEmpty(board) {
+
     // Here we find the next empty cell (so a 0)
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
@@ -9,6 +10,7 @@ function findEmpty(board) {
 }
 
 function placeable(board, num, row, col) {
+
     // Checking the horizontal- ,vertical lines and a 3x3 area to see if we can place the number
     const box_row = 3 * Math.floor(row / 3);
     const box_col = 3 * Math.floor(col / 3);
@@ -29,6 +31,7 @@ function placeable(board, num, row, col) {
 }
 
 function solve(board) {
+
     // Here we find the next empty slot and check what we can place there. Then we place it and do it again until it is solved.
     const empty = findEmpty(board);
     if (!empty) return true;
@@ -47,9 +50,11 @@ function solve(board) {
 }
 
 function getSudokuValues() {
+
     // Here we take the given values from the grid and edit it into the proper format to solve it.
     const inputs = document.querySelectorAll('.sudoku-grid input');
     const values = Array.from(inputs).map(input => input.value || 0);
+
     let row = [];
     let sudoku = [];
 
@@ -61,6 +66,51 @@ function getSudokuValues() {
         }
     }
     return sudoku;
+}
+
+function isValid(board){
+
+    // Validating the given sudoku board
+    for(let i = 0; i < 9; i++) {
+        let row_set = new Set();
+        let col_set = new Set();
+        let box_set = new Set();
+
+        let inva = false;
+
+        for(let k = 0; k < 9; k++) {
+            if(board[i][k] != 0) {
+                if (row_set.has(board[i][k])) return false;
+                row_set.add(board[i][k]);
+            }
+
+            if(board[k][i] != 0) {
+                if(col_set.has(board[k][i])) return false;
+                col_set.add(board[k][i]);
+            }
+
+            const box_row = 3 * Math.floor(i / 3) + Math.floor(k / 3);
+            const box_col = 3 * (i % 3) + (k % 3);
+
+            if (board[box_row][box_col] != 0) {
+                if(box_set.has(board[box_row][box_col])) return false;
+                box_set.add(board[box_row][box_col]);
+            }
+        }
+        
+    }
+
+    let err = false;
+    for(let j = 0; j < 81; j++){
+        let check = document.getElementById('input ' + (j + 1));
+        if(isNaN(check.value) || check.value < 0 || check.value > 9){
+            check.classList.add('error');
+            err = true;
+        }
+    }
+    if(err) return false;
+    
+    return true;
 }
 
 // We make the 9x9 grid where you input the sudoku values   
@@ -80,35 +130,25 @@ for (let i = 0; i < 81; i++) {
 }
 
 function main() {
+
     // Here we actually get the solving going by pressing the solve button in the html
     let sudoku = getSudokuValues();
     const result = document.getElementById('result');
     result.innerHTML = "Input a sudoku to solve it!";
 
-    // We show the result in the html site if theres no solution we print that. 
+    if(!isValid(sudoku)) {
+        result.innerHTML = "Invalid input! <br> Double check.";
+        return
+    }
+ 
     // The given values will stay black but the solvied values will change to blue.    
-    if (solve(sudoku)) {
-        let inva = false;
-
-        //Checking if the user gave an invalid input
-        for(let k = 0; k < 81; k++){
-            let check = document.getElementById('input ' + (k + 1));
-            if(isNaN(check.value) || check.value < 0 || check.value > 9){
-                inva = true;
-                check.classList.add('error');
+    if (solve(sudoku)) { 
+        for(let o = 0; o < 81; o++){
+            let inp = document.getElementById('input ' + (o + 1));
+            if(sudoku[Math.floor(o / 9)][o % 9] != inp.value){
+                inp.classList.add('solved');
             }
-        }
-
-        if(inva){
-            result.innerHTML = "Invalid input!";
-        }else{
-            for(let o = 0; o < 81; o++){
-                let inp = document.getElementById('input ' + (o + 1));
-                if(sudoku[Math.floor(o / 9)][o % 9] != inp.value){
-                    inp.classList.add('solved');
-                }
-                inp.value = sudoku[Math.floor(o / 9)][o % 9];
-            }
+            inp.value = sudoku[Math.floor(o / 9)][o % 9];
         }
     } else {
         result.innerHTML = "No Solution!";
@@ -116,6 +156,7 @@ function main() {
 }
 
 function re() {
+
     // Refreshing the grid
     const inputs = document.querySelectorAll('.sudoku-grid input');
     const result = document.getElementById('result');
