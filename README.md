@@ -3,7 +3,7 @@
 
 ## This is a simple script to solve the given sudoku board. 
 <br>
-This project was turned from Pyhton to Javascript. I turned it because i wanted a better input method than making a list on python. When i get OCR to be more accurate i may publish that version also in this repository but for now this is a javascript project.
+This project was turned from Python to Javascript. I turned it because i wanted a better input method than making a list on python. When i get OCR to be more accurate i may publish that version also in this repository but for now this is a javascript project.
 <hr>
 
 ### RULES OF SUDOKU 
