@@ -9,6 +9,10 @@
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
           sans-serif;
+
+        display: flex;
+        justify-content: center;
+        color: white;
       }
       .sudoku-grid {
         display: grid;
@@ -17,10 +21,11 @@
           repeat(2, 35px) 45px
           repeat(3, 35px);
 
-        margin: auto;
         padding: 20px;
+        margin-top: 40px;
         border-radius: 25px;
         width: fit-content;
+        height: fit-content;
         background-color: black;
       }
       .sudoku-grid input {
@@ -28,18 +33,27 @@
         height: 25px;
         text-align: center;
         margin: 1px;
+        border: 1px solid black;
+        border-radius: 4px;
       }
       #sudoku-grid > :nth-child(27n):not(:nth-child(81)) {
         margin-bottom: 15px;
       }
       button {
-        display: flex;
-        margin: auto;
-        margin-bottom: 10px;
+        display: inline;
         color: white;
-        font-size: 20px;
+        font-size: 30px;
+        padding: 10px;
         background-color: black;
-        border-radius: 5px;
+        border-radius: 10px;
+        border: none;
+        margin: 10px;
+      }
+      button:hover {
+        background-color: rgb(59, 59, 59);
+      }
+      button:active {
+        background-color: grey;
       }
       .solved {
         color: blue;
@@ -49,16 +63,31 @@
         background-color: red;
         color: white;
       }
+      .wrapper {
+        background-color: crimson;
+        width: min-content;
+        padding: 50px;
+        border-radius: 50px;
+      }
+      .buttons {
+        display: flex;
+        justify-content: center;
+      }
     </style>
   </head>
   <body>
-    <h1 style="text-align: center">Sudoku Solver</h1>
-    <h3 style="text-align: center" id="result">Input a sudoku to solve it!</h3>
-    <div class="sudoku-grid" id="sudoku-grid"></div>
-    <br /><br />
-    <button onclick="main()">Solve</button>
-    <button onclick="re()">Clear</button>
-
-    <script src="main.js"></script>
+    <div class="wrapper">
+      <h1 style="text-align: center">Sudoku Solver</h1>
+      <h3 style="text-align: center" id="result">
+        Input a sudoku to solve it!
+      </h3>
+      <div class="sudoku-grid" id="sudoku-grid"></div>
+      <br /><br />
+      <div class="buttons">
+        <button onclick="main()">Solve</button>
+        <button onclick="re()">Clear</button>
+      </div>
+      <script src="main.js"></script>
+    </div>
   </body>
 </html>
