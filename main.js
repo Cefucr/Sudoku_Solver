@@ -50,9 +50,8 @@ function getSudokuValues() {
   // Here we take the given values from the grid and edit it into the proper format to solve it.
   const inputs = document.querySelectorAll(".sudoku-grid input");
   const values = Array.from(inputs).map((input) => input.value || 0);
-
+  const sudoku = [];
   let row = [];
-  let sudoku = [];
 
   for (let i = 0; i < values.length; i++) {
     row.push(parseInt(values[i]));
@@ -66,43 +65,63 @@ function getSudokuValues() {
 
 function isValid(board) {
   // Validating the given sudoku board
+  let valid = true;
+
   for (let row = 0; row < 9; row++) {
-    let row_set = new Set();
-    let col_set = new Set();
-    let box_set = new Set();
+    const row_set = new Set();
+    const col_set = new Set();
+    const box_set = new Set();
 
     for (let col = 0; col < 9; col++) {
-      if (board[row][col] != 0) {
-        if (row_set.has(board[row][col])) return false;
-        row_set.add(board[row][col]);
+      const current_row = board[row][col];
+      const current_col = board[col][row];
+
+      if (current_row != 0) {
+        if (row_set.has(current_row)) {
+          const pos = document.getElementById("input " + (row * 9 + col + 1));
+
+          pos.classList.add("error");
+          valid = false;
+        }
+        row_set.add(current_row);
       }
 
-      if (board[col][row] != 0) {
-        if (col_set.has(board[col][row])) return false;
-        col_set.add(board[col][row]);
+      if (current_col != 0) {
+        if (col_set.has(current_col)) {
+          const pos = document.getElementById("input " + (col * 9 + row + 1));
+
+          pos.classList.add("error");
+          valid = false;
+        }
+        col_set.add(current_col);
       }
 
       const box_row = 3 * Math.floor(row / 3) + Math.floor(col / 3);
       const box_col = 3 * (row % 3) + (col % 3);
+      const box_val = board[box_row][box_col];
 
-      if (board[box_row][box_col] != 0) {
-        if (box_set.has(board[box_row][box_col])) return false;
-        box_set.add(board[box_row][box_col]);
+      if (box_val != 0) {
+        if (box_set.has(box_val)) {
+          const pos = document.getElementById(
+            "input " + (box_row * 9 + box_col + 1)
+          );
+
+          pos.classList.add("error");
+          valid = false;
+        }
+        box_set.add(box_val);
       }
     }
   }
 
-  let err = false;
   for (let input = 0; input < 81; input++) {
-    let check = document.getElementById("input " + (input + 1));
+    const check = document.getElementById("input " + (input + 1));
     if (isNaN(check.value) || check.value < 0 || check.value > 9) {
       check.classList.add("error");
-      err = true;
+      valid = false;
     }
   }
-  if (err) return false;
-
-  return true;
+  return valid;
 }
 
 // We make the 9x9 grid where you input the sudoku values
@@ -123,8 +142,9 @@ for (let i = 0; i < 81; i++) {
 
 function main() {
   // Here we actually get the solving going by pressing the solve button in the html
-  let sudoku = getSudokuValues();
+  const sudoku = getSudokuValues();
   const result = document.getElementById("result");
+
   result.innerHTML = "Input a sudoku to solve it!";
 
   if (!isValid(sudoku)) {
@@ -135,7 +155,7 @@ function main() {
   // The given values will stay black but the solvied values will change to blue.
   if (solve(sudoku)) {
     for (let input = 0; input < 81; input++) {
-      let inp = document.getElementById("input " + (input + 1));
+      const inp = document.getElementById("input " + (input + 1));
       if (sudoku[Math.floor(input / 9)][input % 9] != inp.value) {
         inp.classList.add("solved");
       }
