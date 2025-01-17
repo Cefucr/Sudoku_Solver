@@ -3,7 +3,7 @@
 
 ## This is a simple script to solve the given sudoku board. 
 <br>
-This project was turned from Python to Javascript. I turned it because i wanted a better input method than making a list on python.
+This project was originally a python script but i wasn't satisfied with the input method i used in python (a list of lists). I decided to code the whole thing again in Javascript now it is easier to input a sudoku and solve it.
 <hr>
 
 ### RULES OF SUDOKU 
