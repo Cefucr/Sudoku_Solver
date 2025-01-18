@@ -28,19 +28,33 @@ function placeable(board, num, row, col) {
   return true;
 }
 
-function solve(board) {
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function solve(board, logicCheck) {
   // Here we find the next empty slot and check what we can place there. Then we place it and do it again until it is solved.
   const empty = findEmpty(board);
   if (!empty) return true;
 
   // If we do not find any empty places then we have solved the sudoku :D
   const [row, col] = empty;
+
   for (let num = 1; num <= 9; num++) {
     if (placeable(board, num, row, col)) {
+      const val = document.getElementById("input " + (row * 9 + col + 1));
       board[row][col] = num;
-      if (solve(board)) return true;
+      val.value = num;
+      val.classList.add("solved");
+
+      if (await solve(board, logicCheck)) return true;
 
       board[row][col] = 0;
+      val.value = "";
+    }
+    // If you want to see the logic working we have to add a litle delay otherwise it is too fast to see
+    if (logicCheck) {
+      await delay(1);
     }
   }
   return false;
@@ -140,10 +154,12 @@ for (let i = 0; i < 81; i++) {
   grid.appendChild(input);
 }
 
-function main() {
+async function main() {
   // Here we actually get the solving going by pressing the solve button in the html
   const sudoku = getSudokuValues();
   const result = document.getElementById("result");
+  const checkbox = document.getElementById("logic");
+  const logic = checkbox.checked;
 
   result.innerHTML = "Input a sudoku to solve it!";
 
@@ -152,16 +168,7 @@ function main() {
     return;
   }
 
-  // The given values will stay black but the solvied values will change to blue.
-  if (solve(sudoku)) {
-    for (let input = 0; input < 81; input++) {
-      const inp = document.getElementById("input " + (input + 1));
-      if (sudoku[Math.floor(input / 9)][input % 9] != inp.value) {
-        inp.classList.add("solved");
-      }
-      inp.value = sudoku[Math.floor(input / 9)][input % 9];
-    }
-  } else {
+  if (!(await solve(sudoku, logic))) {
     result.innerHTML = "No Solution!";
   }
 }
