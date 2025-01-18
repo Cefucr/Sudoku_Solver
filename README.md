@@ -13,3 +13,8 @@ Each 3×3 block can only contain numbers from 1 to 9.<br>
 Each vertical column can only contain numbers from 1 to 9.<br>
 Each horizontal row can only contain numbers from 1 to 9.<br>
 Each number in the 3×3 block, vertical column or horizontal row can be used only once.
+
+
+### Current problems
+<br>
+You can press clear in the middle of solving.
