@@ -43,6 +43,7 @@ async function solve(board, logicCheck) {
   for (let num = 1; num <= 9; num++) {
     if (placeable(board, num, row, col)) {
       const val = document.getElementById("input " + (row * 9 + col + 1));
+
       board[row][col] = num;
       val.value = num;
       val.classList.add("solved");
@@ -140,6 +141,7 @@ function isValid(board) {
 
 // We make the 9x9 grid where you input the sudoku values
 const grid = document.getElementById("sudoku-grid");
+let done = true;
 
 for (let i = 0; i < 81; i++) {
   const input = document.createElement("input");
@@ -161,16 +163,20 @@ async function main() {
   const checkbox = document.getElementById("logic");
   const logic = checkbox.checked;
 
-  result.innerHTML = "Input a sudoku to solve it!";
+  result.innerHTML = "Solving...";
 
   if (!isValid(sudoku)) {
     result.innerHTML = "Invalid input! <br> Double check.";
     return;
   }
 
+  done = false;
   if (!(await solve(sudoku, logic))) {
     result.innerHTML = "No Solution!";
+  } else {
+    result.innerHTML = "Solved.";
   }
+  done = true;
 }
 
 function re() {
@@ -178,9 +184,13 @@ function re() {
   const inputs = document.querySelectorAll(".sudoku-grid input");
   const result = document.getElementById("result");
 
-  inputs.forEach((input) => {
-    input.value = "";
-    input.classList.remove("solved", "error");
-  });
-  result.innerHTML = "Input a sudoku to solve it!";
+  if (done) {
+    inputs.forEach((input) => {
+      input.value = "";
+      input.classList.remove("solved", "error");
+    });
+    result.innerHTML = "Input a sudoku to solve it!";
+  } else {
+    result.innerHTML = "Please wait until solving is finished!!";
+  }
 }
