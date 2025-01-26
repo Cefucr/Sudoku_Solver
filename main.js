@@ -1,17 +1,48 @@
-function findEmpty(board) {
-  // Here we find the next empty cell (so a 0)
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
-      if (board[row][col] == 0) return [row, col];
+// We make the 9x9 grid where you input the sudoku values
+const grid = document.getElementById("sudoku-grid");
+const gridSize = 9;
+let done = true;
+
+for (let i = 0; i < gridSize * gridSize; i++) {
+  const input = document.createElement("input");
+  input.id = "input " + (i + 1);
+  input.autocomplete = "off";
+
+  input.addEventListener("input", () => {
+    if (!isNaN(input.value) && input.value >= 0 && input.value <= gridSize) {
+      input.classList.remove("error");
+    }
+  });
+  grid.appendChild(input);
+}
+
+function updateDOM(row, col, className, value) {
+  const cell = document.getElementById("input " + (row * gridSize + col + 1));
+  if (value !== null) cell.value = value;
+  if (className) {
+    cell.classList.add(className);
+  } else {
+    cell.classList.remove("error", "solved");
+  }
+}
+
+function displayMessage(messageElementId, message) {
+  const messageElement = document.getElementById(messageElementId);
+  messageElement.innerHTML = message;
+}
+
+function findEmptySlot(board) {
+  // Find the next empty slot in the sudoku board so we can place a number there
+  for (const [rowIndex, row] of board.entries()) {
+    for (const [colIndex, value] of row.entries()) {
+      if (value === 0) return [rowIndex, colIndex];
     }
   }
   return false;
 }
 
 function addError(row, col) {
-  const cell = document.getElementById("input " + (row * 9 + col + 1));
-  cell.classList.add("error");
-
+  updateDOM(row, col, "error", null);
   return false;
 }
 
@@ -19,62 +50,56 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function placeable(board, num, row, col) {
-  // Checking the horizontal- ,vertical lines and a 3x3 area to see if we can place the number
+function isPlaceable(board, num, row, col) {
   const boxRow = 3 * Math.floor(row / 3);
   const boxCol = 3 * Math.floor(col / 3);
 
+  // Checking if the numbers exits in the row
   if (board[row].includes(num)) return false;
 
-  for (let k = 0; k < 9; k++) {
-    if (num == board[k][col]) return false;
+  // Checking if the numbers exits in the column
+  const colValues = board.map((row) => row[col]);
+  for (const cell of colValues) {
+    if (num === cell) return false;
   }
-
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-      if (board[boxRow + i][boxCol + j] == num) return false;
+  // Checking the 3x3 area to see if the number is already exists
+  for (let boxRowIndex = 0; boxRowIndex < 3; boxRowIndex++) {
+    for (let boxColIndex = 0; boxColIndex < 3; boxColIndex++) {
+      if (board[boxRow + boxRowIndex][boxCol + boxColIndex] == num)
+        return false;
     }
   }
   return true;
 }
 
 function isValid(board) {
-  // Validating the given sudoku board
   let valid = true;
 
-  for (let row = 0; row < 9; row++) {
+  for (let row = 0; row < gridSize; row++) {
     const rowSet = new Set();
     const colSet = new Set();
     const boxSet = new Set();
 
-    for (let col = 0; col < 9; col++) {
-      const currentRow = board[row][col];
-      const currentCol = board[col][row];
+    for (let col = 0; col < gridSize; col++) {
+      const currentRowVal = board[row][col];
+      const currentColVal = board[col][row];
       const boxRow = 3 * Math.floor(row / 3) + Math.floor(col / 3);
       const boxCol = 3 * (row % 3) + (col % 3);
       const boxVal = board[boxRow][boxCol];
-      const cell = document.getElementById("input " + (row * 9 + col + 1));
 
-      // Checks for invalid characters and duplicates
-      if (isNaN(cell.value) || cell.value < 0 || cell.value > 9) {
-        valid = addError(row, col);
-      }
-
-      if (currentRow && rowSet.has(currentRow)) {
-        valid = addError(row, col);
-      }
-
-      if (currentCol && colSet.has(currentCol)) {
-        valid = addError(col, row);
-      }
-
-      if (boxVal && boxSet.has(boxVal)) {
-        valid = addError(boxRow, boxCol);
-      }
-
-      rowSet.add(currentRow);
-      colSet.add(currentCol);
-      boxSet.add(boxVal);
+      const cellCheck = (value, set, row, col) => {
+        if (isNaN(value) || value < 0 || value > 9) {
+          valid = addError(row, col);
+        } else if (value && set.has(value)) {
+          valid = addError(row, col);
+        } else {
+          set.add(value);
+        }
+      };
+      // Checking the row, column and 3x3 area for duplicates
+      cellCheck(currentRowVal, rowSet, row, col);
+      cellCheck(currentColVal, colSet, col, row);
+      cellCheck(boxVal, boxSet, boxRow, boxCol);
     }
   }
   return valid;
@@ -89,7 +114,7 @@ function getSudokuValues() {
 
   for (let i = 0; i < values.length; i++) {
     row.push(parseInt(values[i]));
-    if (row.length == 9) {
+    if (row.length === gridSize) {
       sudoku.push(row);
       row = [];
     }
@@ -97,81 +122,112 @@ function getSudokuValues() {
   return sudoku;
 }
 
-async function solve(board, logicCheck) {
-  // Here we find the next empty slot and check what we can place there. Then we place it and do it again until it is solved.
-  const empty = findEmpty(board);
+async function solve(board, solveSpeed) {
+  // Here we find the next empty slot and check what we can place there.
+  const empty = findEmptySlot(board);
   if (!empty) return true;
   const [row, col] = empty;
 
-  for (let num = 1; num <= 9; num++) {
-    if (placeable(board, num, row, col)) {
-      board[row][col] = num;
+  for (let placeableNum = 1; placeableNum <= 9; placeableNum++) {
+    if (isPlaceable(board, placeableNum, row, col)) {
+      board[row][col] = placeableNum;
 
-      const cell = document.getElementById("input " + (row * 9 + col + 1));
-      cell.value = num;
-      cell.classList.add("solved");
+      // Here we place the number in the sudoku grid
+      updateDOM(row, col, "solved", placeableNum);
 
-      if (await solve(board, logicCheck)) return true;
+      if (await solve(board, solveSpeed)) return true;
       board[row][col] = 0;
-      cell.value = "";
+      updateDOM(row, col, null, "");
     }
-    if (logicCheck) await delay(1); // A little delay to see the logic otherwise it is too fast to see
+    if (solveSpeed > 0) await delay(solveSpeed); // User can choose how fast the sudoku is solved
   }
   return false;
 }
 
-// We make the 9x9 grid where you input the sudoku values
-const grid = document.getElementById("sudoku-grid");
-let done = true;
+async function generator() {
+  //In order to make the sudoku more unique we first place random numbers
+  if (!done) {
+    displayMessage("result", "Please wait until solving is finished!!");
+    return;
+  }
+  displayMessage(
+    "result",
+    "Input a sudoku to solve it or generate one and solve it yourself!"
+  );
+  const difficulty = document.querySelector("#difficulty");
+  const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  let board = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
 
-for (let i = 0; i < 81; i++) {
-  const input = document.createElement("input");
-  input.id = "input " + (i + 1);
-  input.autocomplete = "off";
+  while (nums.length > 0) {
+    const randRow = Math.floor(Math.random() * gridSize);
+    const randCol = Math.floor(Math.random() * gridSize);
+    const randNum = Math.floor(Math.random() * nums.length);
 
-  input.addEventListener("input", () => {
-    if (!isNaN(input.value) && input.value >= 0 && input.value <= 9) {
-      input.classList.remove("error");
+    board[randRow][randCol] = nums[randNum];
+    nums.splice(randNum, 1);
+  }
+  //Just in case for some reason the board is invalid throw an error
+  try {
+    await solve(board, 0); //Here we solve the sudoku
+  } catch (error) {
+    console.error("Failed to solve the Sudoku board:", error);
+    return;
+  }
+  // Removing some values because the higher the difficulty the more values we delete
+  for (let i = 0; i < gridSize * gridSize - difficulty.value; i++) {
+    let randRow = Math.floor(Math.random() * gridSize);
+    let randCol = Math.floor(Math.random() * gridSize);
+    while (board[randRow][randCol] === "") {
+      randRow = Math.floor(Math.random() * gridSize);
+      randCol = Math.floor(Math.random() * gridSize);
     }
-  });
-  grid.appendChild(input);
+    board[randRow][randCol] = "";
+  }
+  board = board.reverse(); //We reverse the board to make it seem more unique
+
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      updateDOM(row, col, null, board[row][col]);
+    }
+  }
 }
 
-async function main() {
+async function solveBtn() {
   // Here we actually get the solving going by pressing the solve button in the html
   const sudoku = getSudokuValues();
-  const result = document.getElementById("result");
-  const checkbox = document.getElementById("logic");
-  const logic = checkbox.checked;
+  const slider = document.getElementById("speed");
+  const speed = slider.value;
 
-  result.innerHTML = "Solving...";
+  displayMessage("result", "Solving...");
 
   if (!isValid(sudoku)) {
-    result.innerHTML = "Invalid input! <br> Double check.";
+    displayMessage("result", "Invalid input! <br> Double check.");
     return;
   }
 
   done = false;
-  if (!(await solve(sudoku, logic))) {
-    result.innerHTML = "No Solution!";
+  if (!(await solve(sudoku, speed))) {
+    displayMessage("result", "No Solution!");
   } else {
-    result.innerHTML = "Solved.";
+    displayMessage("result", "Solved.");
   }
   done = true;
 }
 
-function re() {
+function refreshBtn() {
   // Refreshing the grid
   const inputs = document.querySelectorAll(".sudoku-grid input");
-  const result = document.getElementById("result");
 
   if (done) {
     inputs.forEach((input) => {
       input.value = "";
       input.classList.remove("solved", "error");
     });
-    result.innerHTML = "Input a sudoku to solve it!";
+    displayMessage(
+      "result",
+      "Input a sudoku to solve it or generate one and solve it yourself!"
+    );
   } else {
-    result.innerHTML = "Please wait until solving is finished!!";
+    displayMessage("result", "Please wait until solving is finished!!");
   }
 }
