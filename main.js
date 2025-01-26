@@ -194,6 +194,10 @@ async function generator() {
 
 async function solveBtn() {
   // Here we actually get the solving going by pressing the solve button in the html
+  if (!done) {
+    displayMessage("result", "Please wait until solving is finished!!");
+    return;
+  }
   const sudoku = getSudokuValues();
   const slider = document.getElementById("speed");
   const speed = slider.value;
