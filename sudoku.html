@@ -47,7 +47,7 @@
         background-color: black;
         border-radius: 10px;
         border: none;
-        margin: 10px;
+        margin: 5px;
       }
       button:hover {
         background-color: rgb(59, 59, 59);
@@ -79,22 +79,37 @@
         display: flex;
         justify-content: center;
       }
+      .droplist,.textCentered {
+        display: flex;
+        justify-content: center;
+      }
     </style>
   </head>
   <body>
     <div class="wrapper">
       <h1 style="text-align: center">Sudoku Solver</h1>
       <h3 style="text-align: center" id="result">
-        Input a sudoku to solve it!
+        Input a sudoku to solve it or generate one and solve it yourself!
       </h3>
       <div class="sudoku-grid" id="sudoku-grid"></div>
       <br /><br />
-      <div class="buttons">
-        <button onclick="main()">Solve</button>
-        <button onclick="re()">Clear</button>
+      <div class="droplist">
+        <select id="difficulty">
+          <option value="50"> Easy </option>
+          <option value="30"> Medium </option>
+          <option value="10"> Hard </option>
+        </select>
       </div>
+      <div class="buttons">
+        <button onclick="solveBtn()">Solve</button>
+        <button onclick="generator()"> Generate </button>
+        <button onclick="refreshBtn()"> Clear </button>
+        
+      </div>
+      <div class="textCentered"><h4>Solve speed:</h4></div>
+      
       <div class="check">
-        <input type="checkbox" id="logic">&nbsp;See logic ?<br>&nbsp;Note: It will take a while. </input>
+        <input type="range" id="speed" min="0"  value ="0" max="50" step="5"></input>
       </div>
       <script src="main.js"></script>
     </div>
