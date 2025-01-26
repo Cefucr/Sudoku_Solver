@@ -1,9 +1,10 @@
-# Sudoku_Solver
+# sudokuSolverAndGenerator
 
 
 ## This is a simple script to solve the given sudoku board. 
 <br>
 This project was originally a python script but i wasn't satisfied with the input method i used in python (a list of lists). I decided to code the whole thing again in Javascript now it is easier to input a sudoku and solve it.
+Sudoku solver uses simple backtracking.
 <hr>
 
 ### RULES OF SUDOKU 
